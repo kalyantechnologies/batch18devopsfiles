@@ -1,4 +1,4 @@
-node('nodes')
+node
 {
     def mavenHome = tool name:"maven 3.6.2"
     properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')), pipelineTriggers([pollSCM('* * * * *')])])
@@ -9,8 +9,7 @@ node('nodes')
     stage('Build')
     {
         sh "${mavenHome}/bin/mvn clean package"
-    }
-    /*
+    }   
     stage('uploadartifactintonexus')
     {
         sh "${mavenHome}/bin/mvn deploy"
@@ -21,7 +20,6 @@ node('nodes')
             sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@15.206.167.46://opt/apache-tomcat-9.0.33/webapps/"
 }
 }
-*/
 stage('emilnotification')
 {
     emailext body: '''build is over
