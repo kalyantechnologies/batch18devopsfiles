@@ -1,0 +1,26 @@
+node('master')
+{
+   def mavenHome = tool name:"maven 3.6.3"
+   stage('checkout')
+    {
+    git branch: 'development', credentialsId: 'githubcredentials', url: 'https://github.com/kalyantechnologies/maven-web-application.git'
+    }
+    stage('build')
+    {
+     sh "${mavenHome}/bin/mvn clean package"   
+    }
+    stage('execute sonrqube repoprt')
+    {
+     sh "${mavenHome}/bin/mvn sonar:sonar"
+    }
+    stage('nexus upload')
+    {
+     sh "${mavenHome}/bin/mvn deploy"     
+    }
+    stage('deploy to tomcat')
+    {
+     sshagent(['daa6836b-20b4-4a62-ba58-58174263268e']) {
+     sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.233.54.43://opt/apache-tomcat-9.0.33/webapps/"
+     }
+   }
+}
